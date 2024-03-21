@@ -1,0 +1,82 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<br><br><br>
+<main class="conetent">
+	<div class=" container row">
+		<div class=" col-md-6">
+
+			
+			<div class="" style="border-radius: 15px;">
+				<div class=" border-right chat-messages">
+					
+					<div class="px-4 d-none d-md-block">
+						<div class="d-flex align-items-center">
+							<div class="flex-grow-1">
+								<h1 class="h3 mb-3">Messages</h1>
+								<a class="btn btn-success mt-4 mb-4">New Message</a>
+							</div>
+						</div>
+					</div>
+					
+					{% for user in users %}
+					<div class="container"id="user-{{ user.user.id }}">
+						{% if user.user == request.user %}
+						<a href="{% url 'main_chat' user.receiver.id %}" class="list-group-item list-group-item-action border-0 rounded-0">
+							<div class="badge bg-success float-right"></div>
+							<div class="d-flex align-items-start pb-2">
+								<img src="{% static 'assets1/default.jpg' %}" class="rounded-circle mr-3" alt="img" width="60" height="60">
+								<div class="flex-grow-1">
+									<h6 class="mb-0"><b></b></h6>
+									<div class="small text-muted container pt-4"><span class="fas fa-circle chat-online"></span> @{{ user.receiver}} {{user.receiver.id}}</div>
+								</div>
+									<!-- Display message count for the receiver -->
+									{% for notification_count in notification_counts_receiver %}
+									{% if notification_count.message__user == user.receiver.id %}
+									<span class="mt-4" id="count-{{user.receiver.id }}" style="margin-right: 300px;">{{ notification_count.count }}</span>
+									{% endif %}
+								{% endfor %}
+							</div>
+						</a>
+						
+						{% else %}
+						
+						<a href="{% url 'main_chat' user.user.id %}" class="list-group-item list-group-item-action border-0 rounded-0">
+							<div class="badge bg-success float-right"></div>
+							<div class="d-flex align-items-start pb-2">
+								<img src="{% static 'assets1/default.jpg' %}" class="rounded-circle mr-3" alt="img" width="60" height="60">
+								<div class="flex-grow-1">
+									<h6 class="mb-0"><b></b></h6>
+									<div class="small text-muted container pt-4"><span class="fas fa-circle chat-online"></span> @{{ user.user }} {{user.user.id}}</div>
+								</div>
+								<!-- Display message count for the sender -->
+								{% for notification_count in notification_counts_receiver %}
+								{% if notification_count.message__user == user.user.id %}
+								<span class="mt-4" id="count-{{user.user.id }}" style="margin-right: 300px;">{{ notification_count.count }}</span>
+								{% endif %}
+							{% endfor %}
+						{% endif %}
+					</div>
+				{% endfor %}
+					
+		
+					<hr class="d-block d-lg-none mt-1 mb-0">
+				</div>
+			</div>
+		</div>
+		
+		<div class=" col-md-3"></div>
+		<div class="col-md-3"></div>
+	</div>
+</main>
+{{user.user.id|json_script:"json-username"}}
+
+    <!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+	<!-- <script src="{% static 'js/chat/message.js' %}"></script> -->
+	<script src="{% static 'js/chat/notification.js' %}"></script>
+
+</html>
+{% endblock content %}

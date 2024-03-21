@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h1>Followers</h1>
+{{following_with_status}}
+{% for following_info in following_with_status %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="d-flex align-items-start pb-2">
+                <a href="">
+                    <img src="{{ following_info.following.userprofile.profile_picture.url }}" class="rounded-circle mr-3" alt="img" width="60" height="60">
+                </a>
+                <div class="flex-grow-1">
+                    <h6 class="mb-0"><b></b></h6>
+                    <div class="small text-muted container pt-4"><span class="fas fa-circle chat-online"></span> {{ following_info.following }}</div>
+
+                    {% if following_info.follow_status %}
+                        <button class="follow-unfollow-btn profile-edit-btn" style="color: rgb(0, 128, 255);" href="" data-user-id="{{ following_info.following.id }}" onclick="followUnfollow(this)">Unfollow</button> 
+                    {% else %}
+                        <button class="follow-unfollow-btn profile-edit-btn" style="color: rgb(0, 128, 255);" href="" data-user-id="{{ following_info.following.id }}" onclick="followUnfollow(this)">Follow</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endfor %}
+{% endblock content %}

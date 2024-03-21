@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="correct-integrity-value-here" crossorigin="anonymous">
+
+<body>
+    <style>
+        .container{
+    margin-top:100px;
+}
+
+.btn:hover{
+    color:#46d2f8;
+}
+
+.input-text:focus{
+       
+  
+    box-shadow: 0px 0px 0px;
+    border-color:#46d2f8;
+    outline: 0px;
+}
+
+.form-control {
+    border: 1px solid #46d2f8;
+}
+
+    </style>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-3">
+            <form method="get" action="">
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control input-text" placeholder="Search products...."
+                        name="search_query" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary btn-lg" id="search-input" type="submit"><i
+                                class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4">
+            
+        </div>
+    </div>
+</div>
+
+<!-- Only display the explore section if there is no search query -->
+
+
+<div class="container mt-5">
+        <div id="searchSuggestions">
+        <div class="row">
+            {% for user_profile in user_profiles %}
+            <div class="col-sm-4 col-4 col-md-3">
+                <div class="card mb-4 shadow-sm">
+                    {% if user_profile.profile_picture %}
+                    <img src="{{ user_profile.profile_picture.url }}" class="card-img-top" alt="User Avatar"
+                        style="border-radius: 5px;">
+                    {% else %}
+                    <!-- You can provide a placeholder image if the profile picture is not available -->
+                    <img src="{% static 'path/to/placeholder-image.png' %}" class="card-img-top" alt="User Avatar"
+                        style="border-radius: 5px;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user_profile.user.username }}</h5>
+                        <p class="card-text">{{ user_profile.bio }}</p>
+                        <a href="{% url 'user' user_profile.user.id %}">click</a>
+                        <!-- Add more user information here as needed -->
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        {% for post in random_posts %}
+        <div class=" col-sm-4 col-4 col-md-3">
+            <div class="card mb-4 shadow-sm">
+                <a href="{% url 'details' post.id %}">
+                    <img class="card-img-top" src="{{ post.picture.url }}" alt="Post Content"
+                        style=" border-radius: 5px;">
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+    
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   $(document).ready(function() {
+    $('#searchInput').on('input', function() {
+        var query = $(this).val();
+        if (query.length >= 1) {
+            $.ajax({
+                url: '/search/', // Update URL to match your Django view for searching users
+                method: 'GET',
+                data: {query: query}, // Send the query as data
+                success: function(data) {
+                    console.log(data.bio)
+                    $('#searchSuggestions').html(data);
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        } else {
+            $('#searchSuggestions').html('');
+        }
+    });
+});
+
+
+</script>
+
+
+
+</body>
+{% endblock content %}

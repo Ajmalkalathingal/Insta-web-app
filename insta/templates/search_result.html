@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <div id="searchSuggestions">
+        <div class="row">
+            {% if search_results %}
+                {% for user_profile in search_results %}
+                    <div class="col-sm-4 col-4 col-md-3">
+                        <div class="card mb-4 shadow-sm">
+                            {% if user_profile.profile_picture %}
+                                <img src="{{ user_profile.profile_picture.url }}" class="card-img-top" alt="User Avatar" style="border-radius: 5px;">
+                            {% else %}
+                                <!-- You can provide a placeholder image if the profile picture is not available -->
+                                <img src="{% static 'path/to/placeholder-image.png' %}" class="card-img-top" alt="User Avatar" style="border-radius: 5px;">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ user_profile.user.username }}</h5>
+                                <p class="card-text">{{ user_profile.bio }}</p>
+                                <a href="{% url 'user' user_profile.user.id %}">click</a>
+                                <!-- Add more user information here as needed -->
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <p>No search results found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  {% load static %}
+</head>
+<body>
+  
+  <div class="container">
+    <!-- Display users with stories -->
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <h2>Stories by Other Users:</h2>
+        <!-- Display list of users with clickable names -->
+        <ul>
+          {% for user_with_stories in users_with_stories %}
+            {% if user_with_stories.following != user %}
+              <li>
+                <a href="#" class="user-link" data-bs-toggle="collapse" data-bs-target="#carousel-{{ user_with_stories.following }}">{{ user_with_stories.following }}</a>
+                <div id="carousel-{{ user_with_stories.following }}" class="carousel slide collapse" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    {% for story in user_with_stories.story.all %}
+                      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ story.content.url }}" class="d-block w-100" alt="Story Image">
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ user_with_stories.following }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ user_with_stories.following }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Add event listeners to user links
+    document.querySelectorAll('.user-link').forEach(item => {
+      item.addEventListener('click', event => {
+        // Hide all other carousels
+        document.querySelectorAll('.carousel').forEach(carousel => {
+          if (carousel.id !== event.target.dataset.bsTarget) {
+            carousel.classList.remove('show');
+          }
+        });
+      });
+    });
+  </script>
+  
+  
+  
+  
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
+

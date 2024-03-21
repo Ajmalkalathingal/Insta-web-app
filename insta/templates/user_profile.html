@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+
+    <!-- Metadata -->
+   
+    <!-- Title -->
+    <title>Instagram Profile Layout</title>
+
+    <!-- External CSS Files -->
+    <link rel="stylesheet" href="{% static 'assets3/css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'assets3/css/styles.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+
+</head>
+<body>
+
+    <header>
+        <br><br><br>
+        <div class="container">
+
+            <div class="profile">
+
+                <div class="profile-image">
+
+                    {% if user_profile.profile_picture %}
+                    <img src="{{ user_profile.profile_picture.url }}" alt="User Picture" style="width: 200px; height: 200px;">
+                {% else %}
+                    <!-- Provide a default image or an alternative representation -->
+                    <img src="{% static 'assets1/default.jpg' %}" alt="Default Picture" style="width: 200px; height: 200px;">
+                {% endif %}
+                </div>
+
+                <div class="profile-user-settings">
+                        <h6 class="profile-user-name">@{{user_profile.user.username}}</h6> <br><br>
+
+                        {% if follow_status == True %}
+
+                        <button class="follow-unfollow-btn  profile-edit-btn" style="color: rgb(0, 128, 255);" href="" data-user-id="{{ user.id }}" onclick="followUnfollow(this)">unfollow</button> 
+
+                        {% else %}
+
+                        <button class="follow-unfollow-btn  profile-edit-btn" style="color: rgb(0, 128, 255);" href="" data-user-id="{{ user.id }}" onclick="followUnfollow(this)">follow</button>
+
+                        {% endif %}
+                        
+
+                       
+                            <br><br>
+                            <a href="{% url 'followers' user.id %}" class="profile-edit-btn followers-count" style="text-decoration: none; border: none;">Followers {{ followers_count }}</a>
+                            <a href="" class="profile-edit-btn" style="text-decoration: none; border: none;"></a>
+                            <a href="{% url 'follow' user.id %}" class="profile-edit-btn following-count" style="text-decoration: none; border: none;">Following - {{ following_count }}</a><br><br>
+                            <a href="{% url 'main_chat' user.id %}" class="btn profile-edit-btn mt-2">Message</a> <br><br>
+                            <br>
+            
+
+                    
+                    
+                    
+                   
+                </div>
+
+                
+
+                <div class="profile-bio mt-2" >
+                    <p><span class="profile-real-name"></span>◉ {{user_profile.bio}}</p>
+                <p><span class="profile-real-name"></span>◉ {{user_profile.user.first_name}}</p>
+                <p><span class="profile-real-name"></span>◉ <a href="{{ user_profile.url }}">{{ user_profile.url }}</a></p>
+                <br><br>
+                    <!-- <div class="profile-user-settings">
+                        <a  href=""  class="btns profiele-edit-btn">Posts</a>
+                        <a  href=""  class="btns profeile-edit-btn">Saved</a>
+                    </div> -->
+                </div>
+
+
+                <div class="profile-stats">
+
+                    <ul>
+                        <li><span class="profile-stat-count">{{posts_count}}</span> posts</li>
+                        <li><span class="profile-stat-count">{{followers_count}}</span> followers</li>
+                        <li><span class="profile-stat-count">{{following_count}}</span> following</li>
+                    </ul>
+                    <br>
+                    
+                </div>
+
+            </div>
+            <!-- End of profile section -->
+
+        </div>
+        <!-- End of container -->
+
+    </header>
+    
+    <main>
+
+        <div class="container">
+
+            <div class="gallery">
+                
+                {% for post in posts %}
+            <a href="{{post.get_absolute_url}}"><div class="gallery-item" tabindex="0">
+
+                <img src="{{ post.picture.url }}" class="gallery-image" alt="" style="width: 500px; height: 300px; object-fit: cover;">
+
+                <div class="gallery-item-info">
+
+                    <!-- <ul>
+                        <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> {{post.likes}}</li>
+                        <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> {{post.comment.count}}</li>
+                    </ul> -->
+
+                </div>
+
+            </div></a>
+            {% endfor %}
+
+                
+
+                
+
+            </div>
+            <!-- End of gallery -->
+
+
+        </div>
+        <!-- End of container -->
+
+    </main>
+
+    <script src="{% static 'js/follow_unfollow.js' %}"></script>
+
+    {% endblock content %}
+<!-- Your HTML template -->

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %} 
+
+<header>
+    <link rel="stylesheet" href="{% static 'assets3/css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'assets3/css/styles.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+    <br><br><br>
+    <div class="container">
+
+        <div class="profile">
+
+            <div class="profile-image">
+
+                {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="User Picture" style="width: 200px; height: 200px;">
+            {% else %}
+                <!-- Provide a default image or an alternative representation -->
+                <img src="{% static 'assets1/default.jpg' %}" alt="Default Picture" style="width: 200px; height: 200px;">
+            {% endif %}
+            </div>
+
+            <div class="profile-user-settings">
+                
+                    <h6 class="profile-user-name">@{{user_profile.user.username}} </h6> <br>
+                    <h5 style="font-size: 15px;" class="profile-user-name"></h5>
+
+                    <a style="text-decoration: none;" href="" class="btn profile-edit-btn mt-5">Edit Profile</a>
+                    <a style="text-decoration: none;" href="{% url 'sign-out' %}" class="btn profile-edit-btn mt-5">Logout</a>
+                    <button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog mt-5" aria-hidden="true"></i></button>
+
+                    
+                    <br><br><br>
+                    <a href="{% url 'followers'  user_profile.user.id %}" class="btn profile-edit-btn" style="color: green; border: none;">Followers <span style="font-size: large;">{{followers_count}}</span><br><br></a> 
+                            <a href="{% url 'follow' user_profile.user.id %}" class="btn profile-edit-btn" style="color: red;border: none;">Following <span style="font-size: large;">{{following_count}}</span> <br><br></a> 
+             
+
+                            <!-- <a href="" class="btn profile-edit-btn">Message</a> <br><br> -->
+                    <br>
+
+                
+                
+                
+                
+
+            </div>
+
+            
+
+            <div class="profile-bio">
+                <br>
+                <p><span class="profile-real-name"></span>◉ {{user_profile.bio}}</p>
+                <p><span class="profile-real-name"></span>◉ {{user_profile.user.first_name}}</p>
+                <p><span class="profile-real-name"></span>◉ <a href="{{ user_profile.url }}">{{ user_profile.url }}</a></p>
+                <br><br>
+                <!-- <div class="profile-user-settings">
+                    <a   class="btns profiele-edit-btn">Posts</a>
+                    <a    class="btns profeile-edit-btn">Saved</a>
+                </div> -->
+            </div>
+
+
+            <div class="profile-stats">
+
+                <ul>
+                    <li><span class="profile-stat-count">{{posts_count}}</span> posts</li>
+                    <li><span class="profile-stat-count">{{followers_count}}</span> Post Saved</li>
+                    <li><span class="profile-stat-count">{{following_count}}</span> following</li>
+                </ul>
+                <br>
+                
+            </div>
+
+        </div>
+        <!-- End of profile section -->
+
+    </div>
+    <!-- End of container -->
+
+</header>
+
+<!-- <main>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                {% for post in posts%}
+                <img src="{{ post.picture.url }}" alt="">
+                {% endfor %}
+            </div>
+
+            <div class="col-md-2"></div>
+
+        </div>
+      </div> -->
+    
+
+        
+      <div class="container">
+
+        <div class="gallery">
+            
+            {% for post in posts %}
+            <a href="{{post.get_absolute_url}}"><div class="gallery-item" tabindex="0">
+
+                <img src="{{ post.picture.url }}" class="gallery-image" alt="" style="width: 500px; height: 300px; object-fit: cover;">
+
+                <div class="gallery-item-info">
+
+                    <!-- <ul>
+                        <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> {{post.likes}}</li>
+                        <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> {{post.comment.count}}</li>
+                    </ul> -->
+
+                </div>
+
+            </div></a>
+            {% endfor %}
+
+            
+
+            
+
+        </div>
+        <!-- End of gallery -->
+
+
+    </div>
+    <!-- End of container -->
+
+</main>
+    <script src="{% static 'js/follow_unfollow.js' %}"></script>
+
+{% endblock %}
