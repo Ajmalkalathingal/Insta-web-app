@@ -7,8 +7,6 @@
 <main class="conetent">
 	<div class=" container row">
 		<div class=" col-md-6">
-
-			
 			<div class="" style="border-radius: 15px;">
 				<div class=" border-right chat-messages">
 					
@@ -22,44 +20,57 @@
 					</div>
 					
 					{% for user in users %}
-					<div class="container"id="user-{{ user.user.id }}">
+					<div class="" id="user-{{ user.user.id }}">
 						{% if user.user == request.user %}
 						<a href="{% url 'main_chat' user.receiver.id %}" class="list-group-item list-group-item-action border-0 rounded-0">
-							<div class="badge bg-success float-right"></div>
 							<div class="d-flex align-items-start pb-2">
-								<img src="{% static 'assets1/default.jpg' %}" class="rounded-circle mr-3" alt="img" width="60" height="60">
+								<div class="profile-image">
+									{% if user.receiver.userprofile.profile_picture %}
+									<img src="{{ user.receiver.userprofile.profile_picture.url }}" alt="User Picture" class="rounded-circle mr-3" width="60" height="60">
+									{% else %}
+									<!-- Provide a default image or an alternative representation -->
+									<img src="{% static 'assets1/default.jpg' %}" alt="Default Picture" class="rounded-circle mr-3" width="60" height="60">
+									{% endif %}
+								</div>
 								<div class="flex-grow-1">
 									<h6 class="mb-0"><b></b></h6>
-									<div class="small text-muted container pt-4"><span class="fas fa-circle chat-online"></span> @{{ user.receiver}} {{user.receiver.id}}</div>
+									<div class="small text-muted container pt-4"><span class="fas fa-circle chat-online"></span> @{{ user.receiver }} {{ user.receiver.id }}</div>
 								</div>
-									<!-- Display message count for the receiver -->
-									{% for notification_count in notification_counts_receiver %}
-									{% if notification_count.message__user == user.receiver.id %}
-									<span class="mt-4" id="count-{{user.receiver.id }}" style="margin-right: 300px;">{{ notification_count.count }}</span>
-									{% endif %}
+								<!-- Display message count for the receiver -->
+								{% for notification_count in notification_counts_receiver %}
+								{% if notification_count.message__user == user.receiver.id %}
+								<span class="mt-4 badge bg-success float-right" id="count-{{ user.receiver.id }}-{{ notification_count.count }}">{{ notification_count.count }}</span>
+								{% endif %}
 								{% endfor %}
 							</div>
 						</a>
-						
 						{% else %}
-						
 						<a href="{% url 'main_chat' user.user.id %}" class="list-group-item list-group-item-action border-0 rounded-0">
-							<div class="badge bg-success float-right"></div>
 							<div class="d-flex align-items-start pb-2">
-								<img src="{% static 'assets1/default.jpg' %}" class="rounded-circle mr-3" alt="img" width="60" height="60">
+								<div class="profile-image">
+									{% if user.user.userprofile.profile_picture %}
+									<img src="{{ user.user.userprofile.profile_picture.url }}" alt="User Picture" class="rounded-circle mr-3" width="60" height="60">
+									{% else %}
+									<!-- Provide a default image or an alternative representation -->
+									<img src="{% static 'assets1/default.jpg' %}" alt="Default Picture" class="rounded-circle mr-3" width="60" height="60">
+									{% endif %}
+								</div>
 								<div class="flex-grow-1">
 									<h6 class="mb-0"><b></b></h6>
-									<div class="small text-muted container pt-4"><span class="fas fa-circle chat-online"></span> @{{ user.user }} {{user.user.id}}</div>
+									<div class="text-muted container pt-4"><span class="fas fa-circle chat-online"></span> @{{ user.user }} {{ user.user.id }}</div>
 								</div>
 								<!-- Display message count for the sender -->
 								{% for notification_count in notification_counts_receiver %}
 								{% if notification_count.message__user == user.user.id %}
-								<span class="mt-4" id="count-{{user.user.id }}" style="margin-right: 300px;">{{ notification_count.count }}</span>
+								<span class="mt-4 badge bg-success float-right" id="count-{{ user.user.id }}-{{ notification_count.count }}">{{ notification_count.count }}</span>
 								{% endif %}
-							{% endfor %}
+								{% endfor %}
+							</div>
+						</a>
 						{% endif %}
 					</div>
-				{% endfor %}
+					{% endfor %}
+					
 					
 		
 					<hr class="d-block d-lg-none mt-1 mb-0">

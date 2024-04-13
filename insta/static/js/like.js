@@ -21,7 +21,7 @@ $(document).ready(function () {
 
     let this_val = $(this);
     let post_id = this_val.attr('data-post-id');
-    let like_count = $('#like_' + post_id); 
+    let like_count = $('.like_' + post_id); 
 
     console.log(post_id, 'post_id');
     // console.log(like_count,'count');

@@ -38,9 +38,16 @@
                                         <circle r="31" cy="32" cx="32"/>
                                     </svg>
                                 </div>
+                                {% if story_stream.following.userprofile.profile_picture %}
                                 <div class="story__picture">
                                     <img src="{{ story_stream.following.userprofile.profile_picture.url }}" style="width: 80px; height: 80px; object-fit: cover;">
                                 </div>
+                            {% else %}
+                                <!-- Default placeholder image or fallback -->
+                                <div class="story__picture">
+                                    <img src="{% static 'assets1/default.jpg' %}" style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                            {% endif %}
                             </div>
                             <span class="story__user">@{{ story_stream.following.username }}</span>
                         </button>
@@ -112,13 +119,13 @@
                         </button>
                     </div>
 
-                    <div class="post__content">
-                        <div class="post__medias">
-                            <a href="{% url 'details' post.id %}"><img class="post__media"  src="{{post.picture.url}}" alt="Post Content" style="width: 700px; height: 380px; object-fit: cover;"></a>
-<!--                                <img class="post__media" src="{% static 'assets1/insta-clone.png' %}" alt="Post Content">-->
-<!--                                <img class="post__media" src="{% static 'assets1/insta-clone.png' %}" alt="Post Content">-->
-                        </div>
+                <div class="post__content">
+                    <div class="post__medias">
+                        <a href="{% url 'details' post.id %}"><img class="post__media"  src="{{post.picture.url}}" alt="Post Content" style="width: 700px; height: 380px; object-fit: cover;"></a>
+        <!--                                <img class="post__media" src="{% static 'assets1/insta-clone.png' %}" alt="Post Content">-->
+        <!--                                <img class="post__media" src="{% static 'assets1/insta-clone.png' %}" alt="Post Content">-->
                     </div>
+                </div>
 
                     <div class="post__footer">
                         <div class="post__buttons">
@@ -156,7 +163,7 @@
                             <div class="post__likes">
                                 <a href="#" class="post__likes-avatar">
                                 </a>
-                                <span id="like_{{post.id}}">{{post.likes}} likes <a href="#"></a></span>
+                                <span class="like_{{post.id}}">{{post.likes}} likes <a href="#"></a></span>
                             </div>
 
                             <!-- Add comment -->
@@ -179,7 +186,7 @@
                                 <form method="post" id="review" method="POST" action="{% url 'comment' post.id %}" class="mt-3 hide-form">
                                     {% csrf_token %}
                                     <div class="position-relative">
-                                        <input name="comment" type="text" id="comment_data" placeholder="write comments" style="border: none; width: calc(100% - 40px); outline: none;" class="mr-2" required />
+                                        <input name="comment" type="text" class="comment_data" placeholder="write comments" style="border: none; width: calc(100% - 40px); outline: none;" class="mr-2" required />
                                         <button type="submit" style="border: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);" class="submit-comment" data-comment-id="{{ post.id }}"><i class="fa-regular fa-paper-plane"></i></button>
                                     </div>
                                 </form>
@@ -286,7 +293,7 @@
            
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         
-        <script src="{% static 'js/like.js' %}"></script>
+        <!-- <script src="{% static 'js/like.js' %}"></script> -->
         <script src="{% static 'js/comment.js' %}"></script>
         <script src="{% static 'js/save-post.js' %}"></script>
         <!-- <script src="{% static 'js/story/script.js' %}"></script>

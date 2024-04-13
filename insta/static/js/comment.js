@@ -11,7 +11,7 @@ $(document).ready(function () {
     let thisButton = $(this);
     let comment_id = thisButton.attr('data-comment-id');
     console.log(comment_id)
-    let form = thisButton.closest('form'); // Find the parent form
+    let form = thisButton.closest('form'); 
     console.log(form)
 
     $.ajax({
@@ -21,14 +21,23 @@ $(document).ready(function () {
         dataType: 'json',
         success: function (response) {
             console.log(response.data);
-            // Append the new comme~nt to the #comments h5 tag
-            $('.comments_'+ comment_id).append('<p>' + response.data.comment +' <img src="' + response.data.user.profile_picture + '" alt="User Profile Picture"> </p> ');
-            $('#comment_data').val("")
-            // Additional handling or DOM updates can be added here
+            // Append the new comment to the appropriate container
+            var newComment = '<div class="comment d-flex align-items-start pb-2">' +
+                '<img src="' + response.data.user.profile_picture + '" alt="' + response.data.user.username + ' Profile Picture" class="me-2" style="border-radius: 50%;" width="30px" height="30px">' +
+                '<div class="comment-content">' +
+                '<small class="small fs-6">' + response.data.user.username + '</small>' +
+                '<p class="container mt-2" style="font-size: 13px;">' + response.data.comment + '</p>' +
+                '</div>' +
+                '</div>';
+    
+            $('.comments_'+ comment_id).append(newComment);
+            $('.comment_data').val(""); // Clear the comment input field
+            
         },
         error: function (error) {
             console.log(error);
         }
     });
+    
 });
 });

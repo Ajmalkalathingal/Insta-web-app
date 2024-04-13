@@ -16,7 +16,6 @@ def notification_view(request):
 def del_notification(request, id):
     # Retrieve the notification with the given ID
     notification = get_object_or_404(Notification, id=id, user=request.user)
-    print(notification)
     get_object_or_404(Notification, id=id, user=request.user).delete()
 
     # Redirect back to the notification page

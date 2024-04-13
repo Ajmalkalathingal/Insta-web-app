@@ -39,7 +39,6 @@ def index(request):
     comments = Comments.objects.filter(post__in=post_items)
 
     saved_post_ids = Post_save.objects.filter(user=user).values_list('post__id', flat=True)
-    print(saved_post_ids)
     context = {
         'post_items': post_items,
         'comments': comments,
@@ -80,12 +79,27 @@ def create_post(request):
         return render(request, 'post.html', context)
     
     
-def post_details(request,id):
-    post =  get_object_or_404(Post,id=id)
+from django.core.paginator import Paginator
+
+def post_details(request, id):
+    post = get_object_or_404(Post, id=id)
+    related_posts = Post.objects.filter(tags__in=post.tags.all()).exclude(id=post.id)
+    print(related_posts)
+    
+    paginator = Paginator(related_posts, 10)  # Adjust the number of posts per page as needed
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    comments = Comments.objects.filter(post=post)
+    saved_post_ids = Post_save.objects.filter(user=request.user)
+
     context = {
-        'post':post
+        'post': post,
+        'comments': comments,
+        'saved_post_ids': saved_post_ids,
+        'page_obj': page_obj,
     }
-    return render(request,'post-details.html',context)   
+    return render(request, 'post-details.html', context)  
 
 
 def like(request, post_id):
