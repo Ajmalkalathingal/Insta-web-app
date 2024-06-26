@@ -23,11 +23,17 @@
                                 </svg>
                             </div>
                             <div class="story__picture">
-                                <img src="" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="User Picture">
+                        {% else %}
+                            <!-- Provide a default image or an alternative representation -->
+                            <img src="{% static 'path/to/default_image.jpg' %}" alt="Default Picture">
+                        {% endif %}
                             </div>
                         </div>
                         <span class="story__user"></span>
                     </button>
+
 
                     {% for story_stream in stories %}
                     <a href="{% url 'view_story' story_stream.following.username story_stream.story.first.id %}" class="showModal">

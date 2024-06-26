@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             else {
                 // Handle other types of messages
-                if (data.user !== null) {
+                if (data.user > 0) {
                     let countElement = document.querySelector(`#count-${data.user}`);
                     if (countElement) {
                         countElement.textContent = data.count;

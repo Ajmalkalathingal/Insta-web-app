@@ -19,8 +19,40 @@
     
         <div class="message-table-scroll mt-4" id="card-body" style="height: 550px; overflow-y: auto;">
             <table class="table">
-                <tbody id='chat-body'>
+                <tbody id="chat-body">
                     {% for message in messages %}
+                        <tr>
+                            <td>
+                                {% if message.sender == request.user.username %}
+                                    {% if message.image %}
+                                        <p class="p-2 mt-2 rounded">
+                                            <img src="{{ message.image.url }}" alt="Image" class="img-fluid p-2 mt-2 rounded">
+                                        </p>
+                                    {% else %}
+                                        <p class="p-2 mt-2 rounded">
+                                            <span class="bg-primary p-2 text-white rounded">{{ message.message }}</span>
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    {% if message.image %}
+                                        <p class="p-2 mt-2 rounded">
+                                            <img src="{{ message.image.url }}" alt="Image" class="img-fluid p-2 mt-2 rounded">
+                                        </p>
+                                    {% else %}
+                                        <p class="p-2 mt-2 rounded">
+                                            <span class="bg-success p-2 text-white rounded">{{ message.message }}</span>
+                                        </p>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <p><small class="p-1 shad   ow-sm">{{ message.date|time:'H:i' }}</small></p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                        
+                    <!-- {% for message in messages %}
+           
                     {% if message.sender == request.user.username %}
                     <tr>
                         <td>
@@ -46,7 +78,7 @@
                         </td>
                     </tr>
                     {% endif %}
-                    {% endfor %}
+                    {% endfor %} -->
                 </tbody>
             </table>
         </div>
@@ -55,11 +87,13 @@
                
             </div>
             <div class="col-sm-4">
-                <input type="text" class="form-control" id="message_input" placeholder="Write message...">
+                <input type="text" id="message_input" placeholder="Enter your message">
+                <input type="file" id="image_input" accept="image/*">
+                <button class="btn" id="send_button" style="background-color: #0d6efd;color: #fff;">Submit</button>
+                
             </div>
             <div class="col-sm-4 mt-1">
                 <div class="control">
-                    <button class="btn" id="chat-message-submit" style="background-color: #0d6efd;color: #fff;">Submit</button>
                 </div>
             </div>
         </div>

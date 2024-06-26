@@ -39,7 +39,7 @@
 								<!-- Display message count for the receiver -->
 								{% for notification_count in notification_counts_receiver %}
 								{% if notification_count.message__user == user.receiver.id %}
-								<span class="mt-4 badge bg-success float-right" id="count-{{ user.receiver.id }}-{{ notification_count.count }}">{{ notification_count.count }}</span>
+								<span class="mt-4 badge bg-success float-right" id="count-{{ user.receiver.id }}">{{ notification_count.count }}</span>
 								{% endif %}
 								{% endfor %}
 							</div>
@@ -62,7 +62,7 @@
 								<!-- Display message count for the sender -->
 								{% for notification_count in notification_counts_receiver %}
 								{% if notification_count.message__user == user.user.id %}
-								<span class="mt-4 badge bg-success float-right" id="count-{{ user.user.id }}-{{ notification_count.count }}">{{ notification_count.count }}</span>
+								<span class="mt-4 badge bg-success float-right" id="count-{{ user.user.id }}">{{ notification_count.count }}</span>
 								{% endif %}
 								{% endfor %}
 							</div>

@@ -50,7 +50,7 @@ def get_notification(sender, instance, created, **kwargs):
             'receiver': receiver_user.id,
             'user' : user.id
         }
-        print(data)
+        # print(data)
         # Send WebSocket message to the specific user
         room_name = str(receiver_user.id)
         # print('room name notification',room_name)
