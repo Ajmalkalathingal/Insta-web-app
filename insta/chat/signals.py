@@ -53,7 +53,7 @@ def get_notification(sender, instance, created, **kwargs):
         # print(data)
         # Send WebSocket message to the specific user
         room_name = str(receiver_user.id)
-        # print('room name notification',room_name)
+        print('room name notification',room_name)
         async_to_sync(channel_layer.group_send)(
             room_name, {
                 'type': 'send_notifications',

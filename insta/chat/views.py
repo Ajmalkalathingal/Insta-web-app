@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from .models import Message,Notificaton
 from django.contrib.auth.models import User
 from django.db.models import Count 
-from django.http import JsonResponse
+from django.db.models import Q
+from django.utils import timezone
+from datetime import date
 
 
 @login_required
@@ -21,19 +23,27 @@ def main_chat(request, user_id):
         thread_name = f'chat_{user_obj.id}-{request.user.id}'
 
     messages = Message.objects.filter(theard_name=thread_name)
-    
+    last_seen = (
+        Message.objects.filter(user=user_obj)
+        .order_by('-date')
+        .values_list('date', flat=True)
+        .first()
+)    
 
  # Fetch notifications related to the messages for the current user and mark them as seen
     notifications = Notificaton.objects.filter(message__in=messages, receiver=request.user, is_seen=False)
     
     # Mark notifications as seen
     notifications.update(is_seen=True) 
+    messages.update(is_read=True)
 
-
+    today = timezone.now().date()
     context = {
         'users': users,
         'user': user_obj,
         'messages': messages,
+        'today': today,
+        'last_seen': last_seen,
     }
 
     return render(request, 'message.html', context)
@@ -42,39 +52,36 @@ def main_chat(request, user_id):
 def chat(request):
     user = request.user
 
-    # Get all messages where the current user is either the sender or receiver
-    all_messages_sent = Message.objects.filter(user=user).order_by('-date')
-    all_messages_received = Message.objects.filter(receiver=user).order_by('-date')
+    # Get latest message per conversation pair
+    messages = Message.objects.filter(
+        Q(user=user) | Q(receiver=user)
+    ).order_by('-date')
 
-    # Combine sent and received messages into a single queryset
-    all_messages = all_messages_sent | all_messages_received
-
-    # store the latest message for each user
     latest_messages = {}
+    for message in messages:
+        other_user = message.receiver if message.user == user else message.user
+        if other_user not in latest_messages:
+            latest_messages[other_user] = message  # first one is latest due to ordering
 
-    # Iterate through messages and keep track of the latest message and unread count for each user
-    for message in all_messages:
-        if message.user == user:
-            other_user = message.receiver
-        else:
-            other_user = message.user
-
-        # Check if Other User Exists in latest_messages or if the Message is More Recent
-        if other_user not in latest_messages or message.date > latest_messages[other_user].date:
-            # Update latest_messages with the Current Message
-            latest_messages[other_user] = message
-
-
-
-    # Get notification counts for the current user as the receiver
-    notification_counts_receiver = Notificaton.objects.filter(message__receiver=user,is_seen=False).values('message__user').annotate(count=Count('message__user'))
-
-    unique_users = list(latest_messages.values())
+    notification_counts_receiver = (
+        Notificaton.objects.filter(
+            receiver=user,
+            is_seen=False
+        )
+        .values('user')  # sender
+        .annotate(count=Count('id'))
+    )
+    print(latest_messages)
     context = {
-        'users': unique_users,
+        'users': list(latest_messages.values()),
         'notification_counts_receiver': notification_counts_receiver,
     }
-    return render(request, 'chat.html', context)
+
+    return render(request, 'new_chat.html', context)
+
+
+
+
 
 
 

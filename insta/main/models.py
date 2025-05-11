@@ -36,7 +36,7 @@ class Post(models.Model):
     likes = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.caption
+        return self.user.username
     
 class Follow(models.Model):
     following = models.ForeignKey(User,on_delete=models.CASCADE,related_name ='following')    
@@ -78,4 +78,4 @@ class Comments(models.Model):
     
 class Post_save(models.Model):
     user = models.ForeignKey(User, on_delete = models.SET_NULL, null=True)    
-    post = models.ForeignKey(Post, on_delete = models.SET_NULL, null=True)    
+    post = models.ForeignKey(Post, on_delete = models.SET_NULL, null=True)   

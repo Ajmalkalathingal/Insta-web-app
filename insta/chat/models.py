@@ -10,7 +10,7 @@ class Message(models.Model):
     theard_name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='messaged_image',null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
-    is_read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)    
 
     def __str__(self) -> str:
         return f"{self.message or self.image}"
