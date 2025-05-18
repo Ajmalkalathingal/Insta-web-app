@@ -68,7 +68,7 @@ def chat(request):
             receiver=user,
             is_seen=False
         )
-        .values('user')  # sender
+        .values('user')  
         .annotate(count=Count('id'))
     )
     print(latest_messages)
