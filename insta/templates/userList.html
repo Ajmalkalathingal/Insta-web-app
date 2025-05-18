@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<hr class="mt-5" />
+<div class="container">
+    <p>create Gruop List</p>
+  <div class="table-responsive shadow-sm rounded-4">
+    <table class="table align-middle table-hover bg-white border">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Profile</th>
+          <th scope="col">Username</th>
+          <th scope="col">Bio</th>
+          <th scope="col" class="text-center">
+            <input type="checkbox" id="select-all" />
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>
+            {% if user.userprofile.get_profile_picture_url %}
+              <img src="{{ user.userprofile.get_profile_picture_url }}" 
+                   alt="Profile Picture" 
+                   class="rounded-circle shadow-sm" 
+                   style="width: 60px; height: 60px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'assets1/default.jpg' %}" 
+                   alt="Default Picture" 
+                   class="rounded-circle shadow-sm" 
+                   style="width: 60px; height: 60px; object-fit: cover;">
+            {% endif %}
+          </td>
+          <td class="fw-bold">{{ user.username }}</td>
+          <td>{{ user.userprofile.bio|default:"No bio" }}</td>
+          <td class="text-center">
+            <input type="checkbox" name="selected_users" value="{{ user.id }}">
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-muted">No users found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// Optional: Select all checkboxes
+document.getElementById('select-all').addEventListener('change', function () {
+  const checkboxes = document.querySelectorAll('input[name="selected_users"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = this.checked;
+  });
+});
+</script>
+{% endblock content %}

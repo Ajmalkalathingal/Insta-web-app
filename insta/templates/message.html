@@ -15,6 +15,7 @@
                 <div class="d-flex">
                   <div class="w-100 d-flex pl-0">
                    
+                   
                   {% if user.profile.image %}
                       <img class="rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="{{ user.profile.image.url }}" alt="{{ user.username }}">
                   {% else %}
@@ -198,9 +199,6 @@
         </div>
       </div>
     </div>
-             {{user.id|json_script:"json-username"}}
-              {{user.username|json_script:"json-username-receiver"}}
-              {{request.user.username|json_script:"json-message-username"}}
             </div>
           </div>
         </div>
@@ -208,11 +206,19 @@
     </div>
   </div>
 </div>
+{{ request.user.id|json_script:"json-sender-id" }}
+{{ request.user.username|json_script:"json-message-username" }}
 
-{{user.id|json_script:"json-username"}}
-{{user.username|json_script:"json-username-receiver"}}
-{{request.user.username|json_script:"json-message-username"}}
+<!-- Optional if private chat -->
 
+  {{ receiver.username|json_script:"json-username-receiver" }}
+
+
+{{receiver.id}}
+<!-- Required for group chat -->
+<div id="chat-container" data-group-name="{{ group_name|default:'' }}"></div>
+
+<div id="chat-container" data-group-name="{{ group_name }}"></div>
 <script src="{% static 'js/chat/message.js' %}"></script>
 <!-- <script src="{% static 'js/chat/notification.js' %}"></script> -->
 {% endblock content %} 

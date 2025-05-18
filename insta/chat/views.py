@@ -1,55 +1,66 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from .models import Message,Notificaton
+from .models import Message,Notificaton,ChatGroup
 from django.contrib.auth.models import User
 from django.db.models import Count 
 from django.db.models import Q
 from django.utils import timezone
-from datetime import date
+from django.shortcuts import get_object_or_404
+from django.db.models import Max, Q, Count
+
 
 
 @login_required
-def main_chat(request, user_id):
-    user_obj = User.objects.get(id=user_id)
+def main_chat(request, group_name=None, user_id=None):
     users = User.objects.exclude(id=request.user.id)
-    
-    
-    # Determine the receiver based on user_id
-    receiver = User.objects.get(id=user_id)
+    messages = []
+    thread_name = None
+    receiver = None
 
-    if request.user.id > user_obj.id:
-        thread_name = f'chat_{request.user.id}-{user_obj.id}'
+    if group_name:
+        thread_name = group_name
+        messages = Message.objects.filter(theard_name=thread_name)
+    
+    elif user_id:
+        user_obj = get_object_or_404(User, id=user_id)
+        receiver = user_obj
+
+        # Build private thread name like 'private_3-5'
+        if request.user.id > user_obj.id:
+            room_name = f'{request.user.id}-{user_obj.id}'
+        else:
+            room_name = f'{user_obj.id}-{request.user.id}'
+        
+        thread_name = f'private_{room_name}'
+        print(thread_name,"thread name message")
+        messages = Message.objects.filter(theard_name=thread_name)
+    
     else:
-        thread_name = f'chat_{user_obj.id}-{request.user.id}'
+        return redirect('home')
 
-    messages = Message.objects.filter(theard_name=thread_name)
-    last_seen = (
-        Message.objects.filter(user=user_obj)
-        .order_by('-date')
-        .values_list('date', flat=True)
-        .first()
-)    
-
- # Fetch notifications related to the messages for the current user and mark them as seen
-    notifications = Notificaton.objects.filter(message__in=messages, receiver=request.user, is_seen=False)
-    
-    # Mark notifications as seen
-    notifications.update(is_seen=True) 
+    # Mark messages as read
     messages.update(is_read=True)
+    print(messages)
+    # Mark related notifications as seen
+    Notificaton.objects.filter(
+        message__in=messages,
+        receiver=request.user,
+        is_seen=False
+    ).update(is_seen=True)
 
-    today = timezone.now().date()
     context = {
         'users': users,
-        'user': user_obj,
         'messages': messages,
-        'today': today,
-        'last_seen': last_seen,
+        'today': timezone.now().date(),
+        'receiver': receiver,
+        'thread_name': thread_name,
+        'group_name': group_name,
     }
 
     return render(request, 'message.html', context)
 
 
-def chat(request):
+def chatt(request):
     user = request.user
 
     # Get latest message per conversation pair
@@ -71,7 +82,6 @@ def chat(request):
         .values('user')  # sender
         .annotate(count=Count('id'))
     )
-    print(latest_messages)
     context = {
         'users': list(latest_messages.values()),
         'notification_counts_receiver': notification_counts_receiver,
@@ -81,11 +91,61 @@ def chat(request):
 
 
 
+def load_users(request):
+    users = User.objects.all()
+    print(users,'userfrhgyguijghogy')
+    return render(request, 'userList.html', {'users': users})
 
 
 
 
 
+def chat(request):
+    user = request.user
+
+    # Get all private messages (1-to-1 conversations)
+    private_messages = Message.objects.filter(
+        Q(user=user) | Q(receiver=user),
+        group__isnull=True  # Only private messages (no group)
+    ).order_by('-date')
+
+    latest_private = {}
+    for msg in private_messages:
+        other_user = msg.receiver if msg.user == user else msg.user
+        if other_user.id not in latest_private:
+            latest_private[other_user.id] = {
+                'type': 'private',
+                'other_user': other_user,
+                'message': msg
+            }
+
+    # Get latest message per group the user is in
+    group_messages = Message.objects.filter(
+        group__members=user).values('group') .annotate(latest_date=Max('date')).order_by('-latest_date')
+    group = ChatGroup.objects.all()
+
+    latest_group = []
+    for gm in group_messages:
+        latest_msg = Message.objects.filter(group_id=gm['group'], date=gm['latest_date']).first()
+        latest_group.append({
+            'type': 'group',
+            'group': latest_msg.group,
+            'message': latest_msg
+        })
+
+    # Get notification counts for the receiver
+    notification_counts_receiver = Notificaton.objects.filter(
+        receiver=user,
+        is_seen=False
+    ).values('user').annotate(count=Count('id'))
+
+    context = {
+        'private_chats': list(latest_private.values()),
+        'group_chats': latest_group,
+        'notification_counts_receiver': notification_counts_receiver,
+    }
+
+    return render(request, 'new_chat.html', context)
 
 
 

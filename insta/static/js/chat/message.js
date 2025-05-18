@@ -116,14 +116,29 @@
     
 
 
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        const user_id = JSON.parse(document.getElementById('json-username').textContent);
+        const user_id = JSON.parse(document.getElementById('json-sender-id').textContent);
         const user_message = JSON.parse(document.getElementById('json-message-username').textContent);
         const receiver = JSON.parse(document.getElementById('json-username-receiver').textContent);
+        
+
+        const chatContainer = document.getElementById('chat-container');
+        const groupName = chatContainer?.dataset.groupName || null;
 
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        const websocket = new WebSocket(`${protocol}${window.location.host}/ws/${user_id}/`);
+        let socketUrl;
+
+        if ( user_id) {
+            socketUrl = `${protocol}${window.location.host}/ws/${user_id}/`;
+        } else {
+            socketUrl = `${protocol}${window.location.host}/ws/${groupName}/`;
+        }
+
+        const websocket = new WebSocket(socketUrl);
 
         websocket.addEventListener('open', () => {
             console.log('WebSocket connected');
@@ -139,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         websocket.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
+            console.log('New message:', data);
             const chatMessages = document.querySelector('.chat-messages');
             if (!chatMessages) return;
 
@@ -197,13 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sendButton = document.querySelector('.chat-search .input-group .input-group-append');
         const messageInput = document.querySelector('.chat-search input[type="text"]');
-
         const imageInput = document.getElementById('chat-file-input');
         const uploadTrigger = document.getElementById('chat-upload');
 
         if (uploadTrigger && imageInput) {
             uploadTrigger.addEventListener('click', () => {
-                imageInput.click(); // Trigger the hidden file input
+                imageInput.click();
             });
         }
 
@@ -226,7 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             username: user_message,
                             receiver: receiver,
                             message_type: 'image',
-                            image: imageData
+                            image: imageData,
+                            group_name: groupName,
                         }));
                     };
                     reader.readAsDataURL(file);
@@ -236,13 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         message: message,
                         username: user_message,
                         receiver: receiver,
-                        message_type: 'text'
+                        message_type: 'text',
+                        group_name: groupName,
                     }));
                     messageInput.value = '';
                 }
             });
-        } else {
-            console.error('Send button not found');
         }
 
         const chatMessages = document.querySelector('.chat-messages');

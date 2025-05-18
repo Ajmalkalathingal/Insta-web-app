@@ -4,16 +4,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const websocketNotification = new WebSocket('ws://' + window.location.host + '/ws/notification/');
 
     websocketNotification.onopen = function () {
-        console.log('notification connected');
+        // console.log('notification connected');
     }
 
     websocketNotification.onmessage = function (event) {
         let data = JSON.parse(event.data);
-        console.log(data)
+        // console.log(data)
 
         try {
             if (data.type === 'initial_notification_count') {
-                console.log('Initial Notification Count:', data.count);
+                // console.log('Initial Notification Count:', data.count);
                 if (data.count<0) {
                     let count = document.querySelector(`#count-${data.user}`);
                     if (count) {
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     let countElement = document.querySelector(`#count-${data.user}`);
                     if (countElement) {
                         countElement.textContent = data.count;
-                        console.log(countElement)
+                        // console.log(countElement)
                     } else {
                         // console.error('Element not found:', `#count-${data.user}`);
                     }
