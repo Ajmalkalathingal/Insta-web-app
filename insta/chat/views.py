@@ -49,35 +49,87 @@ def main_chat(request, user_id):
     return render(request, 'message.html', context)
 
 
+# def chat(request):
+#     user = request.user
+
+#     # Get latest message per conversation pair
+#     messages = Message.objects.filter(
+#         Q(user=user) | Q(receiver=user)
+#     ).order_by('-date')
+
+#     latest_messages = {}
+#     for message in messages:
+#         other_user = message.receiver if message.user == user else message.user
+#         if other_user not in latest_messages:
+#             latest_messages[other_user] = message  # first one is latest due to ordering
+
+#     notification_counts_receiver = (
+#         Notificaton.objects.filter(
+#             receiver=user,
+#             is_seen=False
+#         )
+#         .values('user')  
+#         .annotate(count=Count('id'))
+#     )
+#     print(latest_messages)
+#     context = {
+#         'users': list(latest_messages.values()),
+#         'notification_counts_receiver': notification_counts_receiver,
+#     }
+
+#     return render(request, 'new_chat.html', context)
+
+
+
+
+from django.db.models import OuterRef, Subquery, Count, Q
+
 def chat(request):
     user = request.user
 
-    # Get latest message per conversation pair
-    messages = Message.objects.filter(
-        Q(user=user) | Q(receiver=user)
+    # Subquery: latest message id between current user and each other user
+    latest_msg_subquery = Message.objects.filter(
+        Q(user=user, receiver=OuterRef('pk')) | Q(user=OuterRef('pk'), receiver=user)
     ).order_by('-date')
 
-    latest_messages = {}
-    for message in messages:
-        other_user = message.receiver if message.user == user else message.user
-        if other_user not in latest_messages:
-            latest_messages[other_user] = message  # first one is latest due to ordering
+    # Users who have chatted with current user
+    chat_users = User.objects.exclude(id=user.id).filter(
+        Q(sent_messages__receiver=user) | Q(received_messages__user=user)
+    ).distinct().annotate(
+        latest_message_id=Subquery(latest_msg_subquery.values('id')[:1])
+    )
 
+    # Fetch all latest messages for chat users in one go
+    latest_message_ids = [u.latest_message_id for u in chat_users if u.latest_message_id]
+    latest_messages = Message.objects.filter(id__in=latest_message_ids).order_by('-date')
+
+    # Build a dict for quick lookup of latest messages by id
+    latest_messages_dict = {msg.id: msg for msg in latest_messages}
+
+    print(latest_messages_dict,'dict')
+
+    # Attach latest message object to each chat_user
+    for chat_user in chat_users:
+        chat_user.latest_msg = latest_messages_dict.get(chat_user.latest_message_id, None)
+
+    # Notifications count grouped by sender user
     notification_counts_receiver = (
         Notificaton.objects.filter(
             receiver=user,
             is_seen=False
         )
-        .values('user')  
+        .values('user')
         .annotate(count=Count('id'))
     )
-    print(latest_messages)
+    
+
     context = {
-        'users': list(latest_messages.values()),
+        'chat_users': chat_users,
         'notification_counts_receiver': notification_counts_receiver,
     }
 
     return render(request, 'new_chat.html', context)
+
 
 
 

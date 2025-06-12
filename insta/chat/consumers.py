@@ -110,20 +110,17 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         
         # Send the initial notification count to the client
         await self.send_notification({
-            'type': 'notification_countt',
             'count': initial_notification_count,
             'user': receiver_id,
             'user_receiver': user_id
         })
 
     async def send_notification(self, event):
-        print(event)
+        # print(event)
         await self.send(json.dumps(event))
 
     async def send_notifications(self, event):
         data = event.get('value')  # Fetch data
-
-        print(data, 'data')
 
         if data:
             data_dict = json.loads(data)
@@ -148,34 +145,25 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         try:
             user = User.objects.get(id=self.user_id)
         except User.DoesNotExist:
-        # Handle the case where the user doesn't exist
-            return 0, self.user_id, self.user_id
+            return 0, self.user_id, self.user_id  # fallback if user not found
 
-        notifications = Notificaton.objects.select_related('message__user').filter(message__receiver=user, is_seen=False)
-        notification_count = notifications.count()
-
-        user_id = self.user_id
-        receiver_id = None
-
-        if notification_count > 0:
-            first_notification = notifications.first()
-            receiver = first_notification.message.user
-            receiver_id = receiver.id
-        else:
-            # Try to fetch the most recent message and extract the sender (as fallback receiver)
-            latest_message = Message.objects.filter(receiver=user).order_by('-date').first()
-            if latest_message:
-                receiver_id = latest_message.user.id
-            else:
-                # Default to self for edge case fallback
-                receiver_id = user_id
-
-        return notification_count, user_id, receiver_id
-
-
-
-    async def disconnect(self, event):
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
+        # Get unseen notifications where current user is the receiver
+        notifications = Notificaton.objects.select_related('message__user').filter(
+            message__receiver=user,
+            is_seen=False
         )
+
+        if notifications.exists():
+            latest_notification = notifications.order_by('-id').first()
+            sender = latest_notification.message.user
+
+            notification_count = notifications.filter(
+                message__user=sender
+            ).count()
+
+            return notification_count, sender.id, user.id
+        else:
+            # No unseen notifications: just return 0 and the user ID as receiver
+            return 0, None, user.id
+
+
