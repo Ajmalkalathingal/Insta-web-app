@@ -16,7 +16,7 @@
             <div class="profile-image">
 
                 {% if user_profile.profile_picture %}
-                <img src="{{ user_profile.profile_picture.url }}" alt="User Picture" style="width: 200px; height: 200px;">
+                <img src="{{ user_profile.get_profile_picture_url }}" alt="User Picture" style="width: 200px; height: 200px;">
             {% else %}
                 <!-- Provide a default image or an alternative representation -->
                 <img src="{% static 'assets1/default.jpg' %}" alt="Default Picture" style="width: 200px; height: 200px;">

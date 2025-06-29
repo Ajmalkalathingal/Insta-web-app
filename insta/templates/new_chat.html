@@ -39,7 +39,7 @@
                     <a href="{% url 'main_chat' chat_user.id %}">
                         <div class="chat-item d-flex py-3">
                             {% if chat_user.userprofile.profile_picture %}
-                                <img class="rounded-circle avatar-sm mr-3 shadow" src="{{ chat_user.userprofile.profile_picture.url }}" alt="{{ chat_user.username }}">
+                                <img class="rounded-circle avatar-sm mr-3 shadow" src="{{ chat_user.userprofile.get_profile_picture_url}}" alt="{{ chat_user.username }}">
                             {% else %}
                                 <img class="rounded-circle avatar-sm mr-3 shadow" src="{% static 'assets1/default.jpg' %}" alt="default">
                             {% endif %}

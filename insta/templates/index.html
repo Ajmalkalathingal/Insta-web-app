@@ -13,87 +13,52 @@
                     </svg>
                 </button>
                 <div class="stories__content">
-
-
-                    <button class="story">
+                    <a class="story" href="{% url 'story:upload_story' %}">
                         <div class="story__avatar">
                             <div class="story__border">
                                 <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
                                     <circle r="31" cy="32" cx="32"/>
                                 </svg>
                             </div>
+                            {% if user_profile.profile_picture %}
                             <div class="story__picture">
-                                {% if user_profile.profile_picture %}
                             <img src="{{ user_profile.profile_picture.url }}" alt="User Picture">
+                            <span class="d-flex justify-content-center align-items-center mt-1"><i class="fas fa-plus-circle"></i></span>
                         {% else %}
-                            <!-- Provide a default image or an alternative representation -->
                             <img src="{% static 'path/to/default_image.jpg' %}" alt="Default Picture">
+                            <span class="d-flex justify-content-center align-items-cente mt-1r"><i class="fas fa-plus-circle"></i></span>
+
                         {% endif %}
                             </div>
                         </div>
-                        <span class="story__user"></span>
-                    </button>
+                        <span class="story__user">{{request.user.username}}</span>
+                    </a>
 
 
-                    {% for story_stream in stories %}
-                    <a href="{% url 'view_story' story_stream.following.username story_stream.story.first.id %}" class="showModal">
-                        <button class="story">
+                    {% for story in stories %}
+
+                    <a href="{% url 'story:view_user_stories' story.id %}" class="story">
                             <div class="story__avatar">
                                 <div class="story__border">
                                     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
                                         <circle r="31" cy="32" cx="32"/>
                                     </svg>
                                 </div>
-                                {% if story_stream.following.userprofile.profile_picture %}
+                                {% if story.userprofile.profile_picture %}
                                 <div class="story__picture">
-                                    <img src="{{ story_stream.following.userprofile.profile_picture.url }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                    <img src="{{ story.userprofile.get_profile_picture_url }}">
                                 </div>
                             {% else %}
                                 <!-- Default placeholder image or fallback -->
                                 <div class="story__picture">
-                                    <img src="{% static 'assets1/default.jpg' %}" style="width: 80px; height: 80px; object-fit: cover;">
+                                    <img src="{% static 'assets1/default.jpg' %}" >
                                 </div>
                             {% endif %}
                             </div>
-                            <span class="story__user">@{{ story_stream.following.username }}</span>
-                        </button>
+                            <span class="story__user">@{{ story.username}}</span>
                     </a>
                 {% endfor %}
-
-<!--                     
-
-                     <button class="story">
-                        <div class="story__avatar">
-                            <div class="story__border">
-                                <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                                    <circle r="31" cy="32" cx="32"/>
-                                </svg>
-                            </div>
-                            <div class="story__picture">
-                                <img src="">
-                            </div>
-                        </div>
-                        <span class="story__user">@robert</span>
-                    </button>
-                    <button class="story">
-                        <div class="story__avatar">
-                            <div class="story__border">
-                                <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-                                    <circle r="31" cy="32" cx="32"/>
-                                </svg>
-                            </div>
-                            <div class="story__picture">
-                                <img src="">
-                            </div>
-                        </div>
-                        <span class="story__user">@destiny</span>
-                    </button> -->
                 </div>
-                <button class="stories__right-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path fill="var(--primary)" d="M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z"></path>
-                    </svg>
-                </button>
             </div>
 
             <div class="posts">
@@ -304,33 +269,5 @@
         <script src="{% static 'js/save-post.js' %}"></script>
         <!-- <script src="{% static 'js/story/script.js' %}"></script>
         <script src="{% static 'js/story/slider.js' %}"></script> -->
-        <script>
-    //         document.addEventListener('DOMContentLoaded', function () {
-    //     document.querySelectorAll('.user-profile-link').forEach(function (link) {
-    //         link.addEventListener('click', function (event) {
-    //             event.preventDefault(); // Prevent default action of following the link
-
-    //             // Fetch and display the story corresponding to the clicked user profile
-    //             var userId = link.getAttribute('href').split('/').pop();
-    //             console.log(userId, ' user id') // Extract user ID from the href attribute
-    //             fetchUserStory(userId); // Implement this function to fetch and display the story
-    //         });
-    //     });
-    // });
-    // function fetchUserStory(userId) {
-    //     // Make an AJAX request to fetch the stories for the given user ID
-    //     $.ajax({
-    //         url: '/view_story/' + userId, // Update the URL to match your endpoint
-    //         method: 'GET',
-    //         success: function (response) {
-    //             // Once the data is received, update the DOM to display the stories
-    //             $('#user-stories').html(response);
-    //         },
-    //         error: function (xhr, status, error) {
-    //             console.error(error);
-    //         }
-    //     });
-    // }
-    
         </script>
     {% endblock content %}

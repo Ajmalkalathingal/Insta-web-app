@@ -111,7 +111,7 @@
                     <div class="profile-button__border"></div>
                     <div class="profile-button__picture">
                         {% if user_profile.profile_picture %}
-                            <img src="{{ user_profile.profile_picture.url }}" alt="User Picture">
+                            <img src="{{ user_profile.get_profile_picture_url }}" alt="User Picture">
                         {% else %}
                             <!-- Provide a default image or an alternative representation -->
                             <img src="{% static 'path/to/default_image.jpg' %}" alt="Default Picture">
@@ -159,7 +159,7 @@
             <div class="profile-button__border"></div>
             <div class="profile-button__picture">
                 {% if user_profile.profile_picture %}
-                    <img src="{{ user_profile.profile_picture.url }}" alt="User Picture">
+                    <img src="{{ user_profile.get_profile_picture_url }}" alt="User Picture">
                 {% else %}
                     <!-- Provide a default image or an alternative representation -->
                     <img src="{% static 'path/to/default_image.jpg' %}" alt="Default Picture">

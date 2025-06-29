@@ -6,12 +6,12 @@ from Authuser.models import UserProfile
 from django.contrib.auth.models import User 
 from .models import Stream,Post,Tag,Like,Comments,Follow,Post_save
 from .forms import NewPost
-
+from django.utils import timezone
+from collections import defaultdict
+from django.utils import timezone
 # story modedl
-from story.models import Story,StoryStream
+from story.models import Story
 # from story.models import get_stories_of_followed_users,get_followed_users
-from datetime import datetime
-
 
 from random import sample
 
@@ -23,9 +23,18 @@ def index(request):
     # Get the users that the current user is following
     following_users = Follow.objects.filter(follower=user).values_list('following', flat=True)
 
-    # Filter StoryStream objects based on the followed users
-    stories = StoryStream.objects.filter(user__in=following_users)
+    # Get all unexpired stories from following users
+    all_stories = Story.objects.filter(
+        user__in=following_users,
+        expires_at__gt=timezone.now()
+    ).order_by('user', 'created_at')
 
+    # Group stories by user
+    stories_by_user = defaultdict(list)
+    for story in all_stories:
+        stories_by_user[story.user].append(story)
+        # print(story.user.userprofile.profile_picture)
+    
     # get post for followed user
     posts = Stream.objects.filter(user=user)
 
@@ -42,7 +51,7 @@ def index(request):
     context = {
         'post_items': post_items,
         'comments': comments,
-        'stories': stories,
+        'stories': stories_by_user,
         'saved_post_ids':saved_post_ids
     }
 

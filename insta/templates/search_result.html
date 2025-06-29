@@ -9,7 +9,7 @@
                     <div class="col-sm-4 col-4 col-md-3">
                         <div class="card mb-4 shadow-sm">
                             {% if user_profile.profile_picture %}
-                                <img src="{{ user_profile.profile_picture.url }}" class="card-img-top" alt="User Avatar" style="border-radius: 5px;">
+                                <img src="{{ user_profile.get_profile_picture_url }}" class="card-img-top" alt="User Avatar" style="border-radius: 5px;">
                             {% else %}
                                 <!-- You can provide a placeholder image if the profile picture is not available -->
                                 <img src="{% static 'path/to/placeholder-image.png' %}" class="card-img-top" alt="User Avatar" style="border-radius: 5px;">

@@ -14,6 +14,13 @@ class UserProfile(models.Model):
 
     def __str__(self) -> str:
         return self.user.username
+    
+    @property
+    
+    def get_profile_picture_url(self):
+        if self.profile_picture:
+            return self.profile_picture.url
+        return ""
 
 
 @receiver(post_save, sender=User)
@@ -34,4 +41,3 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         user_profile.save()
 
 
-# Create your models here.

@@ -1,0 +1,230 @@
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<style>
+  body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Helvetica Neue', sans-serif;
+  }
+
+  .story-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .story-box {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+    background-color: #111;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+  }
+
+  .progress-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 10px 0 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+  }
+
+  .progress-segment {
+    flex: 1;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-segment .fill {
+    height: 100%;
+    width: 0%;
+    background-color: white;
+    animation: grow 3s linear forwards;
+  }
+
+  @keyframes grow {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  .story-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-top: 35px;
+  }
+
+  .story-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+
+  .story-content img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+  }
+
+  .story-caption {
+    padding: 10px;
+    font-size: 14px;
+    background-color: #111;
+  }
+
+  .story-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+
+  .btn {
+    background-color: #222;
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
+    border-radius: 30px;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+
+  .btn:hover {
+    background-color: #333;
+  }
+</style>
+
+<div class="story-wrapper">
+  <div class="story-box">
+
+    <div class="progress-container" id="progress-container"></div>
+
+    <div class="story-header">
+      <div class="d-flex align-items-center">
+        <img id="profile-pic" src="{% static 'assets1/default.jpg' %}" />
+        <h6 id="username" class="mb-0"></h6>
+      </div>
+      <small id="story-time" class="text-muted"></small>
+    </div>
+
+    <div class="story-content">
+      <img id="story-image" />
+    </div>
+
+    <div class="story-caption" id="story-caption"></div>
+
+    <div class="story-controls">
+      <button class="btn" id="next-story-btn">Next Story</button>
+      <button class="btn" id="next-user-btn">Next User</button>
+    </div>
+  </div>
+</div>
+
+{{ start_user_id|json_script:"start-user-id" }}
+{{ user_ids|json_script:"user-ids" }}
+
+<script>
+  const userIds = JSON.parse(document.getElementById("user-ids").textContent);
+  const startUserId = JSON.parse(document.getElementById("start-user-id").textContent);
+  let currentUserIndex = userIds.indexOf(startUserId);
+  let currentStories = [];
+  let currentStoryIndex = 0;
+
+  function fetchStories(userId) {
+    fetch(`/story/fetch/${userId}/`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.stories || data.stories.length === 0) {
+          nextUser();
+          return;
+        }
+
+        document.getElementById("profile-pic").src = data.profile_picture;
+        document.getElementById("username").innerText = data.username;
+
+        currentStories = data.stories;
+        currentStoryIndex = 0;
+
+        createProgressSegments(currentStories.length);
+        showStory();
+      })
+      .catch(err => {
+        console.error("Error fetching story:", err);
+        nextUser();
+      });
+  }
+
+  function createProgressSegments(count) {
+    const container = document.getElementById("progress-container");
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const segment = document.createElement("div");
+      segment.classList.add("progress-segment");
+      const fill = document.createElement("div");
+      fill.classList.add("fill");
+      segment.appendChild(fill);
+      container.appendChild(segment);
+    }
+  }
+
+  function showStory() {
+    if (currentStoryIndex >= currentStories.length) {
+      nextUser();
+      return;
+    }
+
+    const story = currentStories[currentStoryIndex];
+    document.getElementById("story-image").src = story.media_url;
+    document.getElementById("story-caption").innerText = story.caption;
+    document.getElementById("story-time").innerText = story.created;
+
+    // Animate current segment
+    const segments = document.querySelectorAll('.progress-segment .fill');
+    segments.forEach((seg, idx) => {
+      seg.style.animation = 'none';
+      seg.offsetHeight; // force reflow
+      seg.style.width = idx < currentStoryIndex ? '100%' : '0%';
+    });
+
+    const currentFill = segments[currentStoryIndex];
+    if (currentFill) {
+      currentFill.style.animation = 'grow 3s linear forwards';
+    }
+
+    currentStoryIndex++;
+    setTimeout(() => {
+      showStory();
+    }, 3000);
+  }
+
+  function nextUser() {
+    currentUserIndex++;
+    if (currentUserIndex < userIds.length) {
+      fetchStories(userIds[currentUserIndex]);
+    } else {
+      console.log('All user stories finished.');
+      window.location.href = "/";
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("next-story-btn").addEventListener("click", showStory);
+    document.getElementById("next-user-btn").addEventListener("click", nextUser);
+    fetchStories(userIds[currentUserIndex]);
+  });
+</script>
+{% endblock %}

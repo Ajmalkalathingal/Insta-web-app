@@ -26,7 +26,7 @@
 							<div class="d-flex align-items-start pb-2">
 								<div class="profile-image">
 									{% if user.receiver.userprofile.profile_picture %}
-									<img src="{{ user.receiver.userprofile.profile_picture.url }}" alt="User Picture" class="rounded-circle mr-3" width="60" height="60">
+									<img src="{{ user.receiver.userprofile.get_profile_picture_url }}" alt="User Picture" class="rounded-circle mr-3" width="60" height="60">
 									{% else %}
 									<!-- Provide a default image or an alternative representation -->
 									<img src="{% static 'assets1/default.jpg' %}" alt="Default Picture" class="rounded-circle mr-3" width="60" height="60">

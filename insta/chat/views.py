@@ -49,39 +49,6 @@ def main_chat(request, user_id):
     return render(request, 'message.html', context)
 
 
-# def chat(request):
-#     user = request.user
-
-#     # Get latest message per conversation pair
-#     messages = Message.objects.filter(
-#         Q(user=user) | Q(receiver=user)
-#     ).order_by('-date')
-
-#     latest_messages = {}
-#     for message in messages:
-#         other_user = message.receiver if message.user == user else message.user
-#         if other_user not in latest_messages:
-#             latest_messages[other_user] = message  # first one is latest due to ordering
-
-#     notification_counts_receiver = (
-#         Notificaton.objects.filter(
-#             receiver=user,
-#             is_seen=False
-#         )
-#         .values('user')  
-#         .annotate(count=Count('id'))
-#     )
-#     print(latest_messages)
-#     context = {
-#         'users': list(latest_messages.values()),
-#         'notification_counts_receiver': notification_counts_receiver,
-#     }
-
-#     return render(request, 'new_chat.html', context)
-
-
-
-
 from django.db.models import OuterRef, Subquery, Count, Q
 
 def chat(request):

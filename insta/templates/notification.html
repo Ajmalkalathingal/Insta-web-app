@@ -36,7 +36,7 @@
                         <div class="side-menu__user-profile">
                             <a href="{% url 'user' notification.sender.id %}" class="side-menu__user-avatar">
                                 {% if notification.sender.userprofile.profile_picture %}
-                                    <img src="{{ notification.sender.userprofile.profile_picture.url }}" alt="User Picture">
+                                    <img src="{{ notification.sender.userprofile.get_profile_picture_url }}" alt="User Picture">
                                 {% else %}
                                     <img src="{% static 'assets1/default.jpg' %}" alt="User Picture">
                                 {% endif %}
